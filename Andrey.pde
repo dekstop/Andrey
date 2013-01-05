@@ -12,6 +12,7 @@ long lastTimeMillis = -1;
 float cursor = 0f;
 
 MarkovChain mcn, mcv;
+Sequence sn, sv;
 int lastNote, lastVelocity;
 
 void setup() {
@@ -23,14 +24,42 @@ void setup() {
   
   int[] notes = {
     // http://en.wikipedia.org/wiki/General_MIDI#Percussion
+    
+    // Mixed drums
 //    35, 42, 38, 42, 35, 42, 38, 42,   
-    35, 42, 42, 42, 38, 42, 42, 42, 35, 42, 42, 42, 38, 42, 42, 42,  
+
+//    35, 42, 42, 42, 38, 42, 42, 46, 35, 42, 42, 42, 38, 42, 42, 42,  
+//    35, 35, 42, 45, 47, 50, 42, 42, 35, 45, 47, 42, 38, 42, 42, 42,  
+
+//    35, 00, 00, 00, 38, 00, 00, 00, 35, 00, 00, 00, 38, 00, 00, 00,  
+//    35, 35, 00, 45, 47, 50, 00, 00, 35, 45, 47, 00, 38, 00, 00, 00,
+
+    // Kick 1,2
+    35,  0, 35,  0, 
+    35,  0, 35, 35, 
+    35,  0,  0, 35, 
+    35, 36, 36, 36, 
+
+    // HH
+//    42, 42, 42, 42, 
+//    42,  0, 42, 42, 
+//    42, 42, 42, 42, 
+//    42, 42, 42, 46, 
+
+    // Low wood black + claves
+    77,  0,  0,  0, 
+    77,  0,  0,  0, 
+    77,  0,  0,  0, 
+    77, 75, 75, 75, 
+
   };
   mcn = new MarkovChain(notes);
+  sn = new Sequence(notes);
   int[] velocities = {
     99, 50, 70, 50, 99, 50, 70, 50, 99, 50, 70, 50, 99, 50, 70, 50,   
   };
   mcv = new MarkovChain(velocities);
+  sv = new Sequence(velocities);
 }
 
 void draw() {
@@ -51,7 +80,9 @@ void draw() {
     while (cursor > beatDuration) cursor -= beatDuration; // Avoid overflow
 
     int note = mcn.nextValue();
-    int velocity = mcv.nextValue();
+//    int note = sn.nextValue();
+//    int velocity = mcv.nextValue();
+    int velocity = sv.nextValue();
 
     // Note off
     if (lastNote != 0) {
@@ -71,6 +102,22 @@ void draw() {
   }
 }
 
+
+class Sequence {
+  
+  int[] seq;
+  int curIdx = -1;
+  
+  public Sequence(int[] values) {
+    seq = values;
+  }
+  
+  public int nextValue() {
+    curIdx++;
+    if (curIdx>=seq.length) curIdx = 0;
+    return seq[curIdx];
+  }
+}
 
 /**
  * Markov Chain Generator.
