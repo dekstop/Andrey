@@ -1,6 +1,6 @@
 import themidibus.*;
 
-MidiBus myBus; // The MidiBus
+MidiBus myBus;
 
 float bpm = 134f;
 
@@ -20,7 +20,7 @@ void setup() {
   background(0);
 
   MidiBus.list();
-  myBus = new MidiBus(this, -1, "Java Sound Synthesizer");
+  myBus = new MidiBus(null, -1, "Java Sound Synthesizer");
 }
 
 void draw() {
@@ -61,35 +61,5 @@ void draw() {
     lastNoteIdx = noteIdx;
     lastTimeMillis = now;
   }
-}
-
-void noteOn(int channel, int pitch, int velocity) {
-  // Receive a noteOn
-  println();
-  println("Note On:");
-  println("--------");
-  println("Channel:"+channel);
-  println("Pitch:"+pitch);
-  println("Velocity:"+velocity);
-}
-
-void noteOff(int channel, int pitch, int velocity) {
-  // Receive a noteOff
-  println();
-  println("Note Off:");
-  println("--------");
-  println("Channel:"+channel);
-  println("Pitch:"+pitch);
-  println("Velocity:"+velocity);
-}
-
-void controllerChange(int channel, int number, int value) {
-  // Receive a controllerChange
-  println();
-  println("Controller Change:");
-  println("--------");
-  println("Channel:"+channel);
-  println("Number:"+number);
-  println("Value:"+value);
 }
 
