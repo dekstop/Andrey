@@ -25,7 +25,8 @@ void setup() {
 //  midiBus = new MidiBus(null, -1, "Java Sound Synthesizer");
   
 //  new Song01().load(midiBus, voices);
-  new Song02().load(midiBus, voices);
+//  new Song02().load(midiBus, voices);
+  new Song02Perc().load(midiBus, voices);
 }
 
 void draw() {

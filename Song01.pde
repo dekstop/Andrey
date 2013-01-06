@@ -22,15 +22,13 @@ class Song01 {
       27,  0,  0, 39,
     };
     voices.add(new Voice(midiBus, 10, new MarkovChain2(notes), new MarkovChain2(velocities)));
-  //  midiBus.sendControllerChange(10, 10, 60); // Panning: mid
+    midiBus.sendControllerChange(10, 10, 60); // Panning: mid
   
     voices.add(new Voice(midiBus, 12, new MarkovChain2(notes), new MarkovChain2(velocities)));
-  //  midiBus.sendControllerChange(12, 10, 20); // Panning: mid-left
+    midiBus.sendControllerChange(12, 10, 20); // Panning: mid-left
   
-  //  voices.add(new Voice(midiBus, 13, new MarkovChain2(notes), new MarkovChain2(velocities)));
-  //  midiBus.sendControllerChange(13, 10, 100); // Panning: mid-right
-  
-  //  if (1==1) return;
+    voices.add(new Voice(midiBus, 13, new MarkovChain2(notes), new MarkovChain2(velocities)));
+    midiBus.sendControllerChange(13, 10, 100); // Panning: mid-right
   
     // http://en.wikipedia.org/wiki/General_MIDI#Percussion
   
