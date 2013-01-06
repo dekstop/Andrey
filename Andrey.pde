@@ -10,7 +10,7 @@ MidiBus midiBus;
 
 int drumChannel = 9; // 9 = GM percussion
 
-float bpm = 115;
+float bpm = 75;
 long lastTimeMillis = -1;
 float cursor = 0f;
 
@@ -21,84 +21,11 @@ void setup() {
   background(0);
 
   MidiBus.list();
-  midiBus = new MidiBus(null, -1, "Java Sound Synthesizer");
+  midiBus = new MidiBus(null, -1, "IAC Bus 2");
+//  midiBus = new MidiBus(null, -1, "Java Sound Synthesizer");
   
-  int[] velocities = {
-    99, 50, 70, 50, 99, 50, 70, 50, 99, 50, 70, 50, 99, 50, 70, 50,   
-  };
-
-  int[] notes = { // 36: C1
-  // F A C Eb = 41 45 36 39, or 29 33 24 27
-    24,  0, 24, 24,
-    33,  0,  0,  0,
-    36,  0, 36,  0,
-    27, 27, 39,  0,
-
-     0, 24, 24, 24,
-    33,  0,  0,  0,
-    36,  0, 36, 27,
-    27,  0,  0, 39,
-  };
-  voices.add(new Voice(midiBus, 10, new MarkovChain2(notes), new MarkovChain2(velocities)));
-  midiBus.sendControllerChange(10, 10, 60); // Panning: mid
-
-  voices.add(new Voice(midiBus, 12, new MarkovChain2(notes), new MarkovChain2(velocities)));
-  midiBus.sendControllerChange(12, 10, 20); // Panning: mid-left
-
-  voices.add(new Voice(midiBus, 13, new MarkovChain2(notes), new MarkovChain2(velocities)));
-  midiBus.sendControllerChange(13, 10, 100); // Panning: mid-right
-
-  // http://en.wikipedia.org/wiki/General_MIDI#Percussion
-
-  // Kick 1, 2
-  int[] kickNotes = {
-    35,  0, 35,  0, 
-    35,  0, 35, 35, 
-    35,  0,  0, 35, 
-    35, 36, 36, 36, 
-
-    35,  0,  0,  0, 
-    35,  0,  0,  0, 
-    35,  0,  0,  0, 
-    35,  0,  0,  0, 
-  };
-  voices.add(new Voice(midiBus, drumChannel, new MarkovChain2(kickNotes), new Sequence(velocities)));
-  
-  // Snare 1, Clap
-  int[] snareNotes = {
-     0,  0,  0,  0,
-    38,  0,  0,  0,
-     0,  0,  0,  0,
-    39,  0,  0, 39,
-
-     0,  0,  0,  0,
-     0,  0,  0,  0,
-     0,  0,  0,  0,
-    39,  0,  0, 39,
-  };
-  voices.add(new Voice(midiBus, drumChannel, new Sequence(snareNotes), new Sequence(velocities)));
-
-  // HH
-  int[] hhNotes = {
-    42, 42, 42, 42, 
-    42,  0, 42, 42, 
-    42, 42, 42, 42, 
-    42, 42, 42, 46,
-  }; 
-  voices.add(new Voice(midiBus, drumChannel, new MarkovChain2(hhNotes), new Sequence(new int[]{50, 20, 30, 20})));
-
-  // Low wood block + claves
-  int[] percNotes = {
-    77,  0,  0,  0, 
-    77,  0,  0,  0, 
-    77,  0,  0,  0, 
-    77, 75, 75, 75, 
-    77,  0,  0,  0, 
-    77, 75,  0,  0, 
-    77,  0,  0,  0, 
-    77, 75, 75, 75, 
-  };
-  voices.add(new Voice(midiBus, drumChannel, new MarkovChain2(percNotes), new Sequence(velocities)));
+//  new Song01().load(midiBus, voices);
+  new Song02().load(midiBus, voices);
 }
 
 void draw() {
@@ -126,6 +53,19 @@ void draw() {
   }
 }
 
+void keyPressed() {
+  if (key == ESC) {
+    for (Voice voice : voices) {
+      voice.stop();
+    }
+    midiBus.stop();
+    exit();
+  }
+}
+
+/**
+ * Encapsulates a note & velocity generator. Triggers MIDI notes.
+ */
 class Voice {
   MidiBus midiBus;
   int channel;
@@ -145,9 +85,7 @@ class Voice {
     int velocity = velocityGen.nextValue();
 
     // Note off
-    if (lastNote != 0) {
-      midiBus.sendNoteOff(channel, lastNote, lastVelocity);
-    }
+    stop();
 
     // Note on
     if (note > 0) {
@@ -157,6 +95,12 @@ class Voice {
 
     lastNote = note;
     lastVelocity = velocity;
+  }
+  
+  public void stop() {
+    if (lastNote != 0) {
+      midiBus.sendNoteOff(channel, lastNote, lastVelocity);
+    }
   }
 }
 
@@ -183,6 +127,59 @@ class Sequence implements Generator {
     curIdx++;
     if (curIdx>=seq.length) curIdx = 0;
     return seq[curIdx];
+  }
+}
+
+/**
+ * First-order Markov Chain Generator.
+ */
+class MarkovChain implements Generator {
+  
+  Set<Integer> allValues = new HashSet<Integer>();
+  int w;
+  float[][] p = new float[128][128];
+  int lastValue = -1;
+  
+  public MarkovChain(int[] trainingData) {
+
+    // Count successions
+    int[][] c = new int[128][128];
+    for (int idx = 0; idx<trainingData.length; idx++) {
+      int prevIdx = idx - 1;
+      if (prevIdx < 0) { prevIdx += trainingData.length; }
+      allValues.add(trainingData[idx]);
+      c[trainingData[prevIdx]][trainingData[idx]] +=  1;
+    }
+    
+    // Probability map
+    for (int v1=0; v1<128; v1++) {
+      int sum = 0;
+      for (int v2=0; v2<128; v2++) {
+        sum += c[v1][v2];
+      }
+      if (sum > 0) {
+        for (int v2=0; v2<128; v2++) {
+          p[v1][v2] = c[v1][v2] / (float)sum;
+        }
+      }
+    }
+  }
+  
+  public int nextValue() {
+    int value;
+    if (lastValue == -1) {
+      value = (Integer)allValues.toArray()[floor(random(allValues.size()))];
+    } else {
+      float r = random(1f);
+      value = -1;
+      float sum = 0;
+      do {
+        value += 1;
+        sum += p[lastValue][value];
+      } while (sum < r);
+    }
+    lastValue = value;
+    return value;
   }
 }
 
@@ -222,12 +219,9 @@ class MarkovChain2 implements Generator {
         sum += c[v1][v2];
       }
       if (sum > 0) {
-        print((v1>>7) + ", " + (v1&127) + ": ");
         for (int v2=0; v2<128; v2++) {
           p[v1][v2] = c[v1][v2] / (float)sum;
-          print(p[v1][v2] + " ");
         }
-        println();
       }
     }
   }
