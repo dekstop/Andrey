@@ -11,7 +11,7 @@ MidiBus midiBus;
 int drumChannel = 9; // 9 = GM percussion
 
 float bpm = 75;
-long lastTimeMillis = -1;
+long lastTimeNanos = -1;
 float cursor = 0f;
 
 List<Voice> voices = new ArrayList<Voice>();
@@ -21,12 +21,13 @@ void setup() {
   background(0);
 
   MidiBus.list();
-  midiBus = new MidiBus(null, -1, "IAC Bus 2");
-//  midiBus = new MidiBus(null, -1, "Java Sound Synthesizer");
+//  midiBus = new MidiBus(null, -1, "IAC Bus 2");
+  midiBus = new MidiBus(null, -1, "Java Sound Synthesizer");
   
 //  new Song01().load(midiBus, voices);
 //  new Song02().load(midiBus, voices);
-  new Song02Perc().load(midiBus, voices);
+//  new Song02Perc().load(midiBus, voices);
+  new Song03().load(midiBus, voices);
 }
 
 void draw() {
@@ -34,12 +35,12 @@ void draw() {
   float beatDuration = 60f / bpm;
 
   // Update counter
-  long now = System.currentTimeMillis();
-  if (lastTimeMillis == -1) {
-    lastTimeMillis = now;
+  long now = System.nanoTime(); //System.currentTimeMillis();
+  if (lastTimeNanos == -1) {
+    lastTimeNanos = now;
   }
   
-  float elapsedTimeInSeconds = ((now - lastTimeMillis) / 1000f);
+  float elapsedTimeInSeconds = ((now - lastTimeNanos) / (1000*1000*1000f));
   cursor += elapsedTimeInSeconds;
 
   // Play
@@ -50,7 +51,7 @@ void draw() {
       voice.step();
     }
     
-    lastTimeMillis = now;
+    lastTimeNanos = now;
   }
 }
 
@@ -61,6 +62,10 @@ void keyPressed() {
     }
     midiBus.stop();
     exit();
+  } else if (key==' ') {
+    for (Voice voice : voices) {
+      voice.reset();
+    }
   }
 }
 
@@ -103,6 +108,11 @@ class Voice {
       midiBus.sendNoteOff(channel, lastNote, lastVelocity);
     }
   }
+  
+  public void reset() {
+    noteGen.reset();
+    velocityGen.reset();
+  }
 }
 
 /**
@@ -110,6 +120,7 @@ class Voice {
  */
 interface Generator { 
   public int nextValue();
+  public void reset();
 }
 
 /**
@@ -128,6 +139,10 @@ class Sequence implements Generator {
     curIdx++;
     if (curIdx>=seq.length) curIdx = 0;
     return seq[curIdx];
+  }
+  
+  public void reset() {
+    curIdx = -1;
   }
 }
 
@@ -166,10 +181,14 @@ class MarkovChain implements Generator {
     }
   }
   
+  protected int randomValue() {
+    return (Integer)allValues.toArray()[floor(random(allValues.size()))];
+  }
+  
   public int nextValue() {
     int value;
     if (lastValue == -1) {
-      value = (Integer)allValues.toArray()[floor(random(allValues.size()))];
+      value = randomValue();
     } else {
       float r = random(1f);
       value = -1;
@@ -181,6 +200,10 @@ class MarkovChain implements Generator {
     }
     lastValue = value;
     return value;
+  }
+  
+  public void reset() {
+    lastValue = -1;
   }
 }
 
@@ -245,12 +268,16 @@ class MarkovChain2 implements Generator {
   public int nextValue() {
     if (lastValues == -1) {
       lastValues = randomPredecessorPair();
-      println("Randomly selecting previous values: " + (lastValues>>7) + ", " + (lastValues&127));
+//      println("Randomly selecting previous values: " + (lastValues>>7) + ", " + (lastValues&127));
     }
 
     int value = randomSuccessor(lastValues);
     lastValues = ((lastValues << 7) + value) & 0x3F7F; // 14 bits
     return value;
+  }
+  
+  public void reset() {
+    lastValues = -1;
   }
 }
 
