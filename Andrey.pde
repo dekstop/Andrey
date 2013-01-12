@@ -21,13 +21,14 @@ void setup() {
   background(0);
 
   MidiBus.list();
-//  midiBus = new MidiBus(null, -1, "IAC Bus 2");
-  midiBus = new MidiBus(null, -1, "Java Sound Synthesizer");
+  midiBus = new MidiBus(null, -1, "IAC Bus 2");
+//  midiBus = new MidiBus(null, -1, "Java Sound Synthesizer");
   
 //  new Song01().load(midiBus, voices);
 //  new Song02().load(midiBus, voices);
 //  new Song02Perc().load(midiBus, voices);
-  new Song03().load(midiBus, voices);
+//  new Song03().load(midiBus, voices);
+  new Song03Perc().load(midiBus, voices);
 }
 
 void draw() {
@@ -64,6 +65,7 @@ void keyPressed() {
     exit();
   } else if (key==' ') {
     for (Voice voice : voices) {
+      println("Reset");
       voice.reset();
     }
   }

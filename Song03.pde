@@ -19,21 +19,21 @@ class Song03 {
       47, 0, 48, 0, 50, 0, 51, 0, 
     }; 
     voices.add(new Voice(midiBus, 12, new MarkovChain2(v1Notes), new Sequence(velocities)));
-    midiBus.sendControllerChange(12, 10, 20); // Panning: mid-left
+//    midiBus.sendControllerChange(12, 10, 20); // Panning: mid-left
 
     int[] v2Notes = {
-      0, 89, 0, 91, 0, 93, 
-      0, 89, 0, 91, 0,  0,
-      0,  0, 0, 91, 0, 93,
-      0, 93, 0, 91, 0, 89, 
+      0, 65, 0, 67, 0, 69, 
+      0, 65, 0, 67, 0,  0,
+      0,  0, 0, 67, 0, 69,
+      0, 69, 0, 67, 0, 65, 
     }; 
     voices.add(new Voice(midiBus, 13, new MarkovChain2(v2Notes), new Sequence(velocities)));
-    midiBus.sendControllerChange(13, 10, 100); // Panning: mid-right
+//    midiBus.sendControllerChange(13, 10, 100); // Panning: mid-right
 
     int[] v3Notes = {
-      69, 0, 65, 65, 0, 67, 67, 0, 69,  
+      69, 69, 65, 65, 65, 67, 67, 67, 69,  
     }; 
-    voices.add(new Voice(midiBus, 11, new Sequence(v3Notes), new Sequence(new int[]{30, 0, 50})));
+    voices.add(new Voice(midiBus, 11, new Sequence(v3Notes), new Sequence(new int[]{30, 20, 40})));
   }
 }
 
