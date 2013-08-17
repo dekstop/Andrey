@@ -25,8 +25,9 @@ void setup() {
   background(0);
 
   MidiBus.list();
-  //  midiBus = new MidiBus(this, -1, "IAC Bus 2");
-  midiBus = new MidiBus(this, "LPD8", "Java Sound Synthesizer");
+//  midiBus = new MidiBus(this, -1, "IAC Bus 2");
+  midiBus = new MidiBus(this, -1, "TAL-U-No-62-AU");
+//  midiBus = new MidiBus(this, "LPD8", "Java Sound Synthesizer");
 
   //  new Song01().load(midiBus, voices);
   //  new Song02().load(midiBus, voices);

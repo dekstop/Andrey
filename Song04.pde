@@ -16,9 +16,9 @@ class Song04 {
     int[] v1Notes = {
       45, 0, 47, 0, 48, 0, 50, 0, 51, 0,  
       47, 0, 48, 0, 50, 0, 51, 0, 
-      47, 0, 48, 0, 50, 0, 51, 0, 
+      47, 0, 48, 0, 50, 0, 51, 0, 0,
     }; 
-    voices.add(new Voice(midiBus, 12, new MarkovChain2(v1Notes), new Sequence(velocities)));
+    voices.add(new Voice(midiBus, 1, new MarkovChain2(v1Notes), new Sequence(velocities)));
 //    midiBus.sendControllerChange(12, 10, 20); // Panning: mid-left
 
 //    int[] v2Notes = {
