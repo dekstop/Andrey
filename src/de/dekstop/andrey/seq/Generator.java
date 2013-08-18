@@ -1,9 +1,10 @@
 package de.dekstop.andrey.seq;
 
 /**
- * Produces sequences of ints.
+ * Produces sequences of Notes.
  */
 public interface Generator { 
-  public int nextValue();
+
+	public Note[] getNotes(long nowInTicks);
   public void reset();
 }

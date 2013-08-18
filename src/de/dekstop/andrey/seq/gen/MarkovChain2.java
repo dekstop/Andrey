@@ -85,4 +85,10 @@ public class MarkovChain2 implements Generator {
   public void reset() {
     lastValues = -1;
   }
+
+	@Override
+  public Note[] getNotes(long nowInTicks) {
+	  // TODO Auto-generated method stub
+	  return null;
+  }
 }

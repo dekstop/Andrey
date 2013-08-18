@@ -10,13 +10,12 @@ package de.dekstop.andrey;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.dekstop.andrey.play.*;
-import de.dekstop.andrey.songs.Song04;
-import de.dekstop.andrey.util.*;
-
-
 import processing.core.PApplet;
-import themidibus.*;
+import themidibus.MidiBus;
+import de.dekstop.andrey.play.Voice;
+import de.dekstop.andrey.seq.Note;
+import de.dekstop.andrey.seq.Phrase;
+import de.dekstop.andrey.util.BiasedRng;
 
 public class Andrey extends PApplet {
 
@@ -42,14 +41,13 @@ public class Andrey extends PApplet {
   
   float bpm = 75;
 
-  long lastTimeNanos = -1;
-  float cursor = 0f;
-  
   BiasedRng rng = new BiasedRng();
-  
-  List<Voice> voices = new ArrayList<Voice>();
-  
   MidiBus midiBus;
+  
+  List<Voice> voices = new ArrayList<Voice>();  
+  
+  long lastTimeNanos = -1;
+  long nowInTicks; // Current time in ticks, a steadily incremented cursor.
   
   // ========
   // = Main =
@@ -64,38 +62,53 @@ public class Andrey extends PApplet {
   //  midiBus = new MidiBus(this, -1, "TAL-U-No-62-AU");
   //  midiBus = new MidiBus(this, "LPD8", "Java Sound Synthesizer");
     midiBus = new MidiBus(this, -1, "Java Sound Synthesizer");
-  
-    voices = new Song04(rng, midiBus).getVoices();
+    
+//    voices = new Song04(rng, midiBus).getVoices();
+    voices.add(new Voice(midiBus, 1, new Phrase(new Note[]{
+    		new Note(45, 100, 1 * TICKS_PER_BEAT),
+    		new Note( 0,   0, 1 * TICKS_PER_BEAT),
+    		new Note(47,  70, 1 * TICKS_PER_BEAT),
+    		new Note( 0,   0, 1 * TICKS_PER_BEAT),
+    		new Note(48,  70, 1 * TICKS_PER_BEAT),
+    		new Note( 0,   0, 1 * TICKS_PER_BEAT),
+    		new Note(50,  70, 1 * TICKS_PER_BEAT),
+    		new Note( 0,   0, 1 * TICKS_PER_BEAT),
+    })));
   }
-  
-  public void draw() {
+//  45, 0, 47, 0, 48, 0, 50, 0, 51, 0,  
+//  47, 0, 48, 0, 50, 0, 51, 0, 
+//  47, 0, 48, 0, 50, 0, 51, 0, 0,
 
-  	// Initialise timing parameters
+//  100, 70, 70, 70,   
+
+  public void draw() {
+  	// Update cursor
+    long timeNanos = System.nanoTime(); //System.currentTimeMillis();
+    if (lastTimeNanos == -1) {
+      lastTimeNanos = timeNanos;
+    }
+    nowInTicks += getElapsedTimeInTicks(lastTimeNanos, timeNanos);
+
+    // Playback
+    for (Voice voice : voices) {
+    	voice.play(nowInTicks);
+    }
+    
+    // Done.
+    lastTimeNanos = timeNanos;
+  }
+
+	private int getElapsedTimeInTicks(long lastTimeNanos, long timeNanos) {
+	  // Update tempo parameters
     float secondsPerBeat = 60f / bpm;
     float ticksPerSecond = secondsPerBeat / TICKS_PER_BEAT;
-  
-    // Update counter
-    long now = System.nanoTime(); //System.currentTimeMillis();
-    if (lastTimeNanos == -1) {
-      lastTimeNanos = now;
-    }
-  
-    float elapsedTimeInSeconds = ((now - lastTimeNanos) / (1000*1000*1000f));
-    cursor += elapsedTimeInSeconds;
-  
-    // Play
-    if (cursor > secondsPerBeat) { // Next beat?
-      while (cursor > secondsPerBeat) cursor -= secondsPerBeat; // Avoid overflow
-  
-      for (Voice voice : voices) {
-        voice.step();
-      }
-  
-      lastTimeNanos = now;
-    }
+
+    // Calculate ticks delta
+    float elapsedTimeInSeconds = ((timeNanos - lastTimeNanos) / (1000*1000*1000f));
+	  return Math.round(elapsedTimeInSeconds / ticksPerSecond);
   }
   
-  // =============
+	// =============
   // = Callbacks =
   // =============
   
