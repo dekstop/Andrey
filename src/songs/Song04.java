@@ -1,8 +1,21 @@
+package songs;
+
 import java.util.List;
 
-import themidibus.*;
+import play.Voice;
+import seq.Sequence;
+import seq.gen.MarkovChain2;
 
-class Song04 {
+import themidibus.*;
+import util.BiasedRng;
+
+public class Song04 {
+  
+  BiasedRng rng = new BiasedRng();
+
+  public Song04(BiasedRng rng) {
+    this.rng = rng;
+  }
   
   public void load(MidiBus midiBus, List<Voice> voices) {
     int[] velocities = {
@@ -18,7 +31,7 @@ class Song04 {
       47, 0, 48, 0, 50, 0, 51, 0, 
       47, 0, 48, 0, 50, 0, 51, 0, 0,
     }; 
-    voices.add(new Voice(midiBus, 1, new MarkovChain2(v1Notes), new Sequence(velocities)));
+    voices.add(new Voice(midiBus, 1, new MarkovChain2(rng, v1Notes), new Sequence(velocities)));
 //    midiBus.sendControllerChange(12, 10, 20); // Panning: mid-left
 
 //    int[] v2Notes = {
@@ -27,7 +40,7 @@ class Song04 {
 //      0,  0, 0, 67, 0, 69,
 //      0, 69, 0, 67, 0, 65, 
 //    }; 
-//    voices.add(new Voice(midiBus, 13, new MarkovChain2(v2Notes), new Sequence(velocities)));
+//    voices.add(new Voice(midiBus, 13, new MarkovChain2(rng, v2Notes), new Sequence(velocities)));
 ////    midiBus.sendControllerChange(13, 10, 100); // Panning: mid-right
 //
 //    int[] v3Notes = {
