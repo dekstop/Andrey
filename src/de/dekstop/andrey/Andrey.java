@@ -65,18 +65,14 @@ public class Andrey extends PApplet {
   //  midiBus = new MidiBus(this, "LPD8", "Java Sound Synthesizer");
     midiBus = new MidiBus(this, -1, "Java Sound Synthesizer");
   
-    //  new Song01().load(midiBus, voices);
-    //  new Song02().load(midiBus, voices);
-    //  new Song02Perc().load(midiBus, voices);
-    //  new Song03().load(midiBus, voices);
-    //  new Song03Perc().load(midiBus, voices);
-    new Song04(rng).load(midiBus, voices);
-    //  new Song04Perc().load(midiBus, voices);
+    voices = new Song04(rng, midiBus).getVoices();
   }
   
   public void draw() {
-    // Initialise timing parameters
-    float beatDuration = 60f / bpm;
+
+  	// Initialise timing parameters
+    float secondsPerBeat = 60f / bpm;
+    float ticksPerSecond = secondsPerBeat / TICKS_PER_BEAT;
   
     // Update counter
     long now = System.nanoTime(); //System.currentTimeMillis();
@@ -88,8 +84,8 @@ public class Andrey extends PApplet {
     cursor += elapsedTimeInSeconds;
   
     // Play
-    if (cursor > beatDuration) { // Next beat?
-      while (cursor > beatDuration) cursor -= beatDuration; // Avoid overflow
+    if (cursor > secondsPerBeat) { // Next beat?
+      while (cursor > secondsPerBeat) cursor -= secondsPerBeat; // Avoid overflow
   
       for (Voice voice : voices) {
         voice.step();
@@ -146,7 +142,7 @@ public class Andrey extends PApplet {
   // ============
   
   public static void main(String args[]) {
-    PApplet.main(new String[] { "Andrey" });
-//    PApplet.main(new String[] { "--present", "Andrey" });
+    PApplet.main(new String[] { "de.dekstop.andrey.Andrey" });
+//    PApplet.main(new String[] { "--present", "de.dekstop.andrey.Andrey" });
   }
 }

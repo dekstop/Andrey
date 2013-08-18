@@ -1,5 +1,6 @@
 package de.dekstop.andrey.songs;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.dekstop.andrey.play.Voice;
@@ -12,13 +13,17 @@ import themidibus.*;
 
 public class Song04 {
   
-  BiasedRng rng = new BiasedRng();
+  BiasedRng rng;
+  MidiBus midiBus;
+	List<Voice> voices = new ArrayList<Voice>();
 
-  public Song04(BiasedRng rng) {
+  public Song04(BiasedRng rng, MidiBus midiBus) {
     this.rng = rng;
+    this.midiBus = midiBus;
+    load();
   }
   
-  public void load(MidiBus midiBus, List<Voice> voices) {
+  public void load() {
     int[] velocities = {
       100, 70, 70, 70,   
     };
@@ -49,5 +54,8 @@ public class Song04 {
 //    }; 
 //    voices.add(new Voice(midiBus, 11, new Sequence(v3Notes), new Sequence(new int[]{30, 20, 40})));
   }
+  
+  public List<Voice> getVoices() {
+  	return voices;
+  }
 }
-
