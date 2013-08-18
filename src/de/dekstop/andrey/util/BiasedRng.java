@@ -1,4 +1,4 @@
-package util;
+package de.dekstop.andrey.util;
 
 /**
  * Random number generator with variable bias (an offset of [-n/2 .. n2]) and range (a multiplier of [0 .. 1])

@@ -1,6 +1,6 @@
-package play;
+package de.dekstop.andrey.play;
 
-import seq.*;
+import de.dekstop.andrey.seq.*;
 
 import themidibus.*;
 

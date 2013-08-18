@@ -1,10 +1,11 @@
-package seq.gen;
+package de.dekstop.andrey.seq.gen;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import seq.*;
-import util.BiasedRng;
+import de.dekstop.andrey.seq.*;
+import de.dekstop.andrey.util.BiasedRng;
+
 
 /**
  * First-order Markov Chain Generator.

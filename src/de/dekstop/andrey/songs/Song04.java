@@ -1,13 +1,14 @@
-package songs;
+package de.dekstop.andrey.songs;
 
 import java.util.List;
 
-import play.Voice;
-import seq.Sequence;
-import seq.gen.MarkovChain2;
+import de.dekstop.andrey.play.Voice;
+import de.dekstop.andrey.seq.Sequence;
+import de.dekstop.andrey.seq.gen.MarkovChain2;
+import de.dekstop.andrey.util.BiasedRng;
+
 
 import themidibus.*;
-import util.BiasedRng;
 
 public class Song04 {
   

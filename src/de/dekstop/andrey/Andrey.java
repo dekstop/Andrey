@@ -1,3 +1,4 @@
+package de.dekstop.andrey;
 
 /**
  * Andrey -- a MIDI note sequence generator based on Markov chains.
@@ -9,9 +10,10 @@
 import java.util.ArrayList;
 import java.util.List;
 
-import play.*;
-import songs.Song04;
-import util.*;
+import de.dekstop.andrey.play.*;
+import de.dekstop.andrey.songs.Song04;
+import de.dekstop.andrey.util.*;
+
 
 import processing.core.PApplet;
 import themidibus.*;

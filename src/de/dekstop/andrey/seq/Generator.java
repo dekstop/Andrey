@@ -1,4 +1,4 @@
-package seq;
+package de.dekstop.andrey.seq;
 
 /**
  * Produces sequences of ints.

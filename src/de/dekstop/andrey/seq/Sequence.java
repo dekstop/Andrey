@@ -1,4 +1,4 @@
-package seq;
+package de.dekstop.andrey.seq;
 
 /**
  * Repeats a fixed sequence.
