@@ -14,7 +14,10 @@ import processing.core.PApplet;
 import themidibus.MidiBus;
 import de.dekstop.andrey.play.Voice;
 import de.dekstop.andrey.seq.Note;
+import de.dekstop.andrey.seq.Pause;
 import de.dekstop.andrey.seq.Phrase;
+import de.dekstop.andrey.seq.gen.LoopGenerator;
+import de.dekstop.andrey.seq.gen.MarkovChainGenerator;
 import de.dekstop.andrey.util.BiasedRng;
 
 public class Andrey extends PApplet {
@@ -39,7 +42,7 @@ public class Andrey extends PApplet {
   // = State =
   // =========
   
-  float bpm = 75;
+  float bpm = 120;
 
   BiasedRng rng = new BiasedRng();
   MidiBus midiBus;
@@ -56,6 +59,7 @@ public class Andrey extends PApplet {
   public void setup() {
     size(400, 400);
     background(0);
+//    frameRate(10);
   
     MidiBus.list();
   //  midiBus = new MidiBus(this, -1, "IAC Bus 2");
@@ -63,23 +67,47 @@ public class Andrey extends PApplet {
   //  midiBus = new MidiBus(this, "LPD8", "Java Sound Synthesizer");
     midiBus = new MidiBus(this, -1, "Java Sound Synthesizer");
     
-//    voices = new Song04(rng, midiBus).getVoices();
-    voices.add(new Voice(midiBus, 1, new Phrase(new Note[]{
-    		new Note(45, 100, 1 * TICKS_PER_BEAT),
-    		new Note( 0,   0, 1 * TICKS_PER_BEAT),
-    		new Note(47,  70, 1 * TICKS_PER_BEAT),
-    		new Note( 0,   0, 1 * TICKS_PER_BEAT),
-    		new Note(48,  70, 1 * TICKS_PER_BEAT),
-    		new Note( 0,   0, 1 * TICKS_PER_BEAT),
-    		new Note(50,  70, 1 * TICKS_PER_BEAT),
-    		new Note( 0,   0, 1 * TICKS_PER_BEAT),
-    })));
+    loadSong();
   }
-//  45, 0, 47, 0, 48, 0, 50, 0, 51, 0,  
-//  47, 0, 48, 0, 50, 0, 51, 0, 
-//  47, 0, 48, 0, 50, 0, 51, 0, 0,
-
-//  100, 70, 70, 70,   
+  
+  void loadSong() {
+  	Phrase phrase1 = new Phrase(new Note[]{
+    		new Note(45, 100, TICKS_PER_BEAT / 4),
+    		new Pause(        TICKS_PER_BEAT / 4),
+    		new Note(47,  70, TICKS_PER_BEAT / 4),
+    		new Pause(        TICKS_PER_BEAT / 4),
+    		new Note(48,  70, TICKS_PER_BEAT / 4),
+    		new Pause(        TICKS_PER_BEAT / 4),
+    		new Note(50,  70, TICKS_PER_BEAT / 4),
+    		new Pause(        TICKS_PER_BEAT / 4),
+    });
+  	Phrase phrase2 = new Phrase(new Note[]{
+    		new Note(47, 100, TICKS_PER_BEAT / 4),
+    		new Pause(        TICKS_PER_BEAT / 4),
+    		new Note(48,  70, TICKS_PER_BEAT / 4),
+    		new Pause(        TICKS_PER_BEAT / 4),
+    		new Note(50,  70, TICKS_PER_BEAT / 4),
+    		new Pause(        TICKS_PER_BEAT / 4),
+    		new Note(51,  70, TICKS_PER_BEAT / 4),
+    		new Pause(        TICKS_PER_BEAT / 4),
+    });
+  	Phrase phrase3 = new Phrase(new Note[]{
+    		new Note(47, 100, TICKS_PER_BEAT / 4),
+    		new Pause(        TICKS_PER_BEAT / 4),
+    		new Note(48,  70, TICKS_PER_BEAT / 4),
+    		new Pause(        TICKS_PER_BEAT / 4),
+    		new Note(50,  70, TICKS_PER_BEAT / 4),
+    		new Pause(        TICKS_PER_BEAT / 2),
+    });
+  	
+  	Phrase[] sequence = new Phrase[] {
+  			phrase1, phrase2, phrase1, phrase2, 
+  			phrase1, phrase2, phrase1, phrase2, 
+  			phrase1, phrase2, phrase1, phrase3 
+  	};
+//    voices.add(new Voice(midiBus, 1, new LoopGenerator(sequence)));
+    voices.add(new Voice(midiBus, 1, new MarkovChainGenerator(sequence, rng)));
+  } 
 
   public void draw() {
   	// Update cursor
@@ -87,7 +115,8 @@ public class Andrey extends PApplet {
     if (lastTimeNanos == -1) {
       lastTimeNanos = timeNanos;
     }
-    nowInTicks += getElapsedTimeInTicks(lastTimeNanos, timeNanos);
+    int elapsedTimeInTicks = getElapsedTimeInTicks(lastTimeNanos, timeNanos);
+    nowInTicks += elapsedTimeInTicks;
 
     // Playback
     for (Voice voice : voices) {
@@ -98,7 +127,7 @@ public class Andrey extends PApplet {
     lastTimeNanos = timeNanos;
   }
 
-	private int getElapsedTimeInTicks(long lastTimeNanos, long timeNanos) {
+	int getElapsedTimeInTicks(long lastTimeNanos, long timeNanos) {
 	  // Update tempo parameters
     float secondsPerBeat = 60f / bpm;
     float ticksPerSecond = secondsPerBeat / TICKS_PER_BEAT;

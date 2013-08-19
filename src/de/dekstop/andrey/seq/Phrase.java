@@ -6,16 +6,12 @@ import de.dekstop.andrey.util.ArrayUtils;
 
 /**
  * A sequence of notes and pauses.
- * 
- * @author martind
  *
  */
-public class Phrase implements Generator {
+public class Phrase implements ScoreElement {
 	
 	Note[] notes;
 	int duration = 0;
-	long startTicks = 0; // Absolute time in ticks (starts at an arbitrary count)
-	long lastCursorTicks = 0; // Relative time in ticks (starts at 0, can be reset)
 	
 	public Phrase(Note[] notes) {
 	  this.notes = notes;
@@ -23,29 +19,20 @@ public class Phrase implements Generator {
 	  	this.duration += note.duration;
 	  }
   }
-
-	@Override
-	public Note[] getNotes(long nowInTicks) {
-		if (startTicks==0) startTicks = nowInTicks;
-		long cursorTicks = nowInTicks - startTicks;
-		
-		int fromTicksOffset = (int)(lastCursorTicks % this.duration);
-		int toTicksOffset = (int)(cursorTicks % this.duration);
-		Note[] curNotes = selectNotes(fromTicksOffset, toTicksOffset);
-		
-		lastCursorTicks = cursorTicks;
-		return curNotes;
-	}
 	
 	/**
 	 * Select a block of notes within the specified time range [fromTicks, toTicks[.
 	 * The range can wrap around, so that toTicks < fromTicks.
 	 * 
-	 * @param fromTicks start of selection window in number of ticks, must be <= phrase duration
-	 * @param toTicks start of selection window in number of ticks, must be <= phrase duration
+	 * fromTicks and toTicks are relative cursors, starting at 0 (the beginning of the
+	 * phrase.) Selections that start beyond the end of the phrase yield an empty list 
+	 * of notes. 
+	 * 
+	 * @param fromTicks start of selection window in number of ticks
+	 * @param toTicks start of selection window in number of ticks
 	 * @return an empty array, or a sequence of one or more notes
 	 */
-	Note[] selectNotes(int fromTicks, int toTicks) {
+	public Note[] selectNotes(int fromTicks, int toTicks) {
 
 		// Zero-length window?
 		if (fromTicks == toTicks) return new Note[]{};
@@ -84,32 +71,15 @@ public class Phrase implements Generator {
 				break;
 			}
 		}
-		if (fromIdx==-1) throw new IllegalStateException(String.format(
-				"Could not determine fromIdx! fromTicks (%d) may be longer than phrase duration (%d).",
-				fromTicks, duration));
-		if (toIdx==-1) throw new IllegalStateException(String.format(
-				"Could not determine toIdx! toTicks (%d) may be longer than phrase duration (%d).",
-				toTicks, duration));
+		if (fromIdx==-1 || toIdx==-1) return new Note[]{}; // Empty selection at end of phrase
 		return Arrays.copyOfRange(notes, fromIdx, toIdx + 1);
 	}
 	
-	/**
-	 * 
-	 * @param v
-	 * @param a
-	 * @param b
-	 * @return true if v is in the range [a, b[, false otherwise
-	 */
-	boolean between(long v, long a, long b) {
-		return a<=v && v<b;
-	}
-
 	@Override
-	public void reset() {
-		startTicks = 0;
-		lastCursorTicks = 0;
-	}
-	
+  public int getDuration() {
+	  return duration;
+  }
+
 	@Override
   public int hashCode() {
 	  final int prime = 31;

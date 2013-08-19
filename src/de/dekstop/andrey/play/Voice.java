@@ -39,18 +39,18 @@ public class Voice {
     if (notes.length == 0) return;
     Note note = notes[notes.length-1]; // Select last note of current sequence, skip the others.
     
-    if (note.pitch > 0) {
-      midiBus.sendNoteOn(channel, note.pitch, note.velocity);
-//      System.out.println("Note on: " + note.pitch + " at velocity " + note.velocity);
+    if (note.getPitch() > 0) {
+      midiBus.sendNoteOn(channel, note.getPitch(), note.getVelocity());
+//      System.out.println("Note on: " + note.getPitch() + " at velocity " + note.getVelocity());
     }
 
     curNote = note;
-  	curNoteEndInTicks = nowInTicks + note.duration;
+  	curNoteEndInTicks = nowInTicks + note.getDuration();
   }
 
   public void stop() {
-    if (curNote!=null && curNote.pitch != 0) {
-      midiBus.sendNoteOff(channel, curNote.pitch, curNote.velocity);
+    if (curNote!=null && curNote.getPitch() != 0) {
+      midiBus.sendNoteOff(channel, curNote.getPitch(), curNote.getVelocity());
     }
   }
 

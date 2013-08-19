@@ -1,18 +1,41 @@
 package de.dekstop.andrey.seq;
 
-public class Note {
+public class Note implements ScoreElement {
 	
-	static final int PAUSE = 0;
-
-	public int pitch; // MIDI pitch, [0..127], 0 == pause
-	public int velocity; // MIDI velocity, [0..127]
-	public int duration; // In ticks
+	protected int pitch; // MIDI pitch, [0..127], 0 == pause
+	protected int velocity; // MIDI velocity, [0..127]
+	protected int duration; // In ticks
 	
 	public Note(int pitch, int velocity, int duration) {
 	  this.pitch = pitch;
 	  this.velocity = velocity;
 	  this.duration = duration;
   }
+	
+	public int getPitch() {
+		return pitch;
+	}
+
+	public void setPitch(int pitch) {
+		this.pitch = pitch;
+	}
+
+	public int getVelocity() {
+		return velocity;
+	}
+
+	public void setVelocity(int velocity) {
+		this.velocity = velocity;
+	}
+
+	@Override
+	public int getDuration() {
+		return duration;
+	}
+
+	public void setDuration(int duration) {
+		this.duration = duration;
+	}
 
 	@Override
   public int hashCode() {
