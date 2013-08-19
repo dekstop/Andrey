@@ -35,6 +35,8 @@ public class Andrey extends PApplet {
   static final int CH_DRUMS = 9; // 9 = GM percussion
   
   // Controller IDs
+  static final int CTRL_PAN = 10;
+  
   static final int CTRL_RNG_BIAS = 1;
   static final int CTRL_RNG_RANGE = 5;
   
@@ -117,13 +119,15 @@ public class Andrey extends PApplet {
   			phrase1, phrase2, phrase1, phrase3 
   	};
     voices.add(new Voice(midiBus, 1, new MarkovChainGenerator(sequence1, rng)));
+    midiBus.sendControllerChange(1, CTRL_PAN, 20); // Panning: mid left
 
     Phrase[] sequence2 = new Phrase[] {
     		pause2,
     		phrase1, phrase4, phrase1, phrase4, 
   			phrase1, phrase2, phrase1, phrase3,
   	};
-    voices.add(new Voice(midiBus, 1, new LoopGenerator(sequence2)));
+    voices.add(new Voice(midiBus, 2, new LoopGenerator(sequence2)));
+    midiBus.sendControllerChange(2, CTRL_PAN, 100); // Panning: mid right
   } 
 
   public void draw() {
@@ -167,8 +171,8 @@ public class Andrey extends PApplet {
       exit();
     } 
     else if (key==' ') {
+      println("Reset");
       for (Voice voice : voices) {
-        println("Reset");
         voice.reset();
       }
     }
