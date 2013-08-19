@@ -100,13 +100,30 @@ public class Andrey extends PApplet {
     		new Pause(        TICKS_PER_BEAT / 2),
     });
   	
-  	Phrase[] sequence = new Phrase[] {
+		Phrase phrase4 = new Phrase(new Note[] {
+    		new Note(47, 100, TICKS_PER_BEAT / 4),
+    		new Pause(        TICKS_PER_BEAT / 4),
+    		new Note(48,  70, TICKS_PER_BEAT / 4),
+    		new Pause(        TICKS_PER_BEAT / 4),
+		});
+
+		Phrase pause2 = new Phrase(new Note[] {
+    		new Pause(        TICKS_PER_BEAT / 2),
+		});
+
+		Phrase[] sequence1 = new Phrase[] {
   			phrase1, phrase2, phrase1, phrase2, 
   			phrase1, phrase2, phrase1, phrase2, 
   			phrase1, phrase2, phrase1, phrase3 
   	};
-//    voices.add(new Voice(midiBus, 1, new LoopGenerator(sequence)));
-    voices.add(new Voice(midiBus, 1, new MarkovChainGenerator(sequence, rng)));
+    voices.add(new Voice(midiBus, 1, new MarkovChainGenerator(sequence1, rng)));
+
+    Phrase[] sequence2 = new Phrase[] {
+    		pause2,
+    		phrase1, phrase4, phrase1, phrase4, 
+  			phrase1, phrase2, phrase1, phrase3,
+  	};
+    voices.add(new Voice(midiBus, 1, new LoopGenerator(sequence2)));
   } 
 
   public void draw() {
