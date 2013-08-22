@@ -17,7 +17,8 @@ import de.dekstop.andrey.seq.Note;
 import de.dekstop.andrey.seq.Pause;
 import de.dekstop.andrey.seq.Phrase;
 import de.dekstop.andrey.seq.gen.LoopGenerator;
-import de.dekstop.andrey.seq.gen.MarkovChainGenerator;
+import de.dekstop.andrey.seq.gen.MCNoteGenerator;
+import de.dekstop.andrey.seq.gen.MCPhraseGenerator;
 import de.dekstop.andrey.util.BiasedRng;
 
 public class Andrey extends PApplet {
@@ -73,6 +74,18 @@ public class Andrey extends PApplet {
   }
   
   void loadSong() {
+  	Note[] sequence = new Note[]{
+    		new Note(45, 100, TICKS_PER_BEAT / 4),
+    		new Pause(        TICKS_PER_BEAT / 4),
+    		new Note(47,  70, TICKS_PER_BEAT / 4),
+    		new Pause(        TICKS_PER_BEAT / 4),
+    		new Note(48,  70, TICKS_PER_BEAT / 4),
+    		new Pause(        TICKS_PER_BEAT / 4),
+    		new Note(50,  70, TICKS_PER_BEAT / 4),
+    		new Pause(        TICKS_PER_BEAT / 4),
+    };
+    voices.add(new Voice(midiBus, 1, new MCNoteGenerator(sequence, rng)));
+  	/*
   	Phrase phrase1 = new Phrase(new Note[]{
     		new Note(45, 100, TICKS_PER_BEAT / 4),
     		new Pause(        TICKS_PER_BEAT / 4),
@@ -118,7 +131,7 @@ public class Andrey extends PApplet {
   			phrase1, phrase2, phrase1, phrase2, 
   			phrase1, phrase2, phrase1, phrase3 
   	};
-    voices.add(new Voice(midiBus, 1, new MarkovChainGenerator(sequence1, rng)));
+    voices.add(new Voice(midiBus, 1, new MCPhraseGenerator(sequence1, rng)));
     midiBus.sendControllerChange(1, CTRL_PAN, 20); // Panning: mid left
 
     Phrase[] sequence2 = new Phrase[] {
@@ -128,6 +141,7 @@ public class Andrey extends PApplet {
   	};
     voices.add(new Voice(midiBus, 2, new LoopGenerator(sequence2)));
     midiBus.sendControllerChange(2, CTRL_PAN, 100); // Panning: mid right
+    */
   } 
 
   public void draw() {

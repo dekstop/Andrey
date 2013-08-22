@@ -41,7 +41,7 @@ public class Voice {
     
     if (note.getPitch() > 0) {
       midiBus.sendNoteOn(channel, note.getPitch(), note.getVelocity());
-//      System.out.println("Note on: " + note.getPitch() + " at velocity " + note.getVelocity());
+      System.out.println("Note on: " + note.getPitch() + " at velocity " + note.getVelocity());
     }
 
     curNote = note;

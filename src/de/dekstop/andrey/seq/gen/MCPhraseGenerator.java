@@ -4,14 +4,14 @@ import de.dekstop.andrey.markov.MarkovChain;
 import de.dekstop.andrey.seq.Phrase;
 import de.dekstop.andrey.util.Rng;
 
-public class MarkovChainGenerator extends AbstractPhraseGenerator {
+public class MCPhraseGenerator extends AbstractPhraseGenerator {
 	
 	MarkovChain<Phrase> mc = null;
 	Rng rng = null;
 	Phrase firstPhrase = null;
 	Phrase currentPhrase = null;
 	
-	public MarkovChainGenerator(Phrase[] trainingData, Rng rng) {
+	public MCPhraseGenerator(Phrase[] trainingData, Rng rng) {
 		this.mc = new MarkovChain<Phrase>(trainingData);
 		this.rng = rng;
 		firstPhrase = trainingData[0];
