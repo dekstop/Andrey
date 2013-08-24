@@ -60,7 +60,7 @@ public abstract class AbstractPhraseGenerator implements Generator {
 	public void reset() {
 		startTicks = 0;
 		lastCursorTicks = 0;
-		currentPhrase = null;
+		currentPhrase = null; // TODO: send note off; e.g. copy phrase/current note and shorten duration
 		phraseStartInTicks = 0;
 	}
 	

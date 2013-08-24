@@ -14,7 +14,7 @@ public abstract class AbstractGenerator implements Generator {
 	long startTicks = 0; // Absolute time in ticks (starts at an arbitrary count)
 	
 	Note currentNote = null;
-	long noteStartInTicks = 0;
+	long currentNoteEndInTicks = 0;
 
 	@Override
 	public Note[] getNotes(long nowInTicks) {
@@ -27,19 +27,19 @@ public abstract class AbstractGenerator implements Generator {
 		// Initial note
 		if (currentNote==null) {
 			currentNote = getNextNote();
-			noteStartInTicks = cursorTicks;
+			currentNoteEndInTicks = cursorTicks + currentNote.getDuration();
 //			System.out.println(noteStartInTicks + " " + currentNote.getDuration());
 			return new Note[] { currentNote };
 		}
 		
 		// Fill note buffer from phrase sequence
-		long selectionStartInTicks = noteStartInTicks + currentNote.getDuration();
+		long selectionStartInTicks = currentNoteEndInTicks;
 		while (selectionStartInTicks <= cursorTicks) {
 //			System.out.println(selectionStartInTicks + " " + currentNote.getDuration());
 			currentNote = getNextNote();
 			notes.add(currentNote);
-			noteStartInTicks = selectionStartInTicks;
 			selectionStartInTicks += currentNote.getDuration();
+			currentNoteEndInTicks = selectionStartInTicks;
 		};
 		
 		return notes.toArray(new Note[notes.size()]);
@@ -48,8 +48,8 @@ public abstract class AbstractGenerator implements Generator {
 	@Override
 	public void reset() {
 		startTicks = 0;
-		currentNote = null;
-		noteStartInTicks = 0;
+		currentNote = null; // TODO: send note off; e.g. copy note and shorten duration
+		currentNoteEndInTicks = 0;
 	}
 	
 	/**
