@@ -30,6 +30,7 @@ import java.util.concurrent.locks.LockSupport;
 
 import processing.core.PApplet;
 import themidibus.MidiBus;
+import de.dekstop.andrey.play.PlaybackThread;
 import de.dekstop.andrey.play.Voice;
 import de.dekstop.andrey.seq.Note;
 import de.dekstop.andrey.seq.Pause;
@@ -70,10 +71,8 @@ public class Andrey extends PApplet {
   BiasedRng rng = new BiasedRng();
   MidiBus midiBus;
   
+  PlaybackThread playbackThread;
   List<Voice> voices = new ArrayList<Voice>();  
-  
-  long lastTimeNanos = -1;
-  long nowInTicks; // Current time in ticks, a steadily incremented cursor.
   
   // ========
   // = Main =
@@ -92,25 +91,14 @@ public class Andrey extends PApplet {
     
     loadSong();
     
-//    TimerTask playbackTimer = new TimerTask() {
-//      public void run() { 
-//      }
-//    };
-//    new Timer().scheduleAtFixedRate(playbackTimer, 0, Math.round(ticksPerSecond));
-    new Thread() {
-    	public void run () {
-    		long cycleDuration = Math.round((1f / ticksPerSecond) * 1000*1000*1000f);
-    		System.out.println(cycleDuration);
-    		long last = System.nanoTime();
-    		while (!stopped) {
-    			play();
-    			long now = System.nanoTime();
-    			long delayNanos = cycleDuration - (now-last);
-    			if (delayNanos > 0) LockSupport.parkNanos(delayNanos);
-    			last = now;
-    		}
+    // Start playback thread
+    playbackThread = new PlaybackThread(ticksPerSecond, voices);
+    playbackThread.start();
+    Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+    	public void run() {
+    		playbackThread.stopPlayback();
     	}
-    }.start();
+    }));
   }
 
 	public boolean stopped = false;
@@ -189,32 +177,8 @@ public class Andrey extends PApplet {
 //    midiBus.sendControllerChange(2, CTRL_PAN, 100); // Panning: mid right
   } 
 
-  void play() {
-  	// Update cursor
-    long timeNanos = System.nanoTime(); //System.currentTimeMillis();
-    if (lastTimeNanos == -1) {
-      lastTimeNanos = timeNanos;
-    }
-    int elapsedTimeInTicks = getElapsedTimeInTicks(lastTimeNanos, timeNanos);
-    nowInTicks += elapsedTimeInTicks;
-
-    // Playback
-    for (Voice voice : voices) {
-    	voice.play(nowInTicks);
-    }
-    
-    // Done.
-    lastTimeNanos = timeNanos;
-  }
-  
   public void draw() {
   	
-  }
-
-	int getElapsedTimeInTicks(long lastTimeNanos, long timeNanos) {
-    // Calculate ticks delta
-    float elapsedTimeInSeconds = ((timeNanos - lastTimeNanos) / (1000*1000*1000f));
-	  return Math.round(elapsedTimeInSeconds * ticksPerSecond);
   }
   
 	// =============
