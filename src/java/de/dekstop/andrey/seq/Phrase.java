@@ -16,14 +16,44 @@
 package de.dekstop.andrey.seq;
 
 import java.util.Arrays;
-
-import de.dekstop.andrey.util.ArrayUtils;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * A sequence of notes and pauses.
  *
  */
-public class Phrase implements ScoreElement {
+public class Phrase implements ScoreElement, Iterable<Note> {
+	
+	/**
+	 * 
+	 */
+	class PhraseIterator implements Iterator<Note> {
+		
+		Phrase phrase;
+		int idx = -1;
+		
+		public PhraseIterator(Phrase phrase) {
+			this.phrase = phrase;
+		}
+
+		@Override
+    public boolean hasNext() {
+	    return phrase.notes.length > 0 && idx < (phrase.notes.length-1);
+    }
+
+		@Override
+    public Note next() {
+			if (++idx >= phrase.notes.length) throw new NoSuchElementException();
+	    return phrase.notes[idx];
+    }
+
+		@Override
+    public void remove() {
+	    throw new UnsupportedOperationException("Not implemented");
+    }
+		
+	}
 	
 	Note[] notes;
 	int duration = 0;
@@ -35,58 +65,26 @@ public class Phrase implements ScoreElement {
 	  }
   }
 	
-	/**
-	 * Select a block of notes within the specified time range [fromTicks, toTicks].
-	 * 
-	 * fromTicks and toTicks are relative cursors, starting at 0 (the beginning of the
-	 * phrase.) Selections that start beyond the end of the phrase yield an empty list 
-	 * of notes. 
-	 * 
-	 * The selection range can wrap around however, so that toTicks < fromTicks.
-	 * 
-	 * @param fromTicks start of selection window in number of ticks, inclusive
-	 * @param toTicks end of selection window in number of ticks, inclusive
-	 * @return an empty array, or a sequence of one or more notes
-	 */
-	public Note[] selectNotes(int fromTicks, int toTicks) {
-
-		// Window wraps around phrase ending?
-		if (toTicks < fromTicks) {
-			return ArrayUtils.concat(selectNotes(fromTicks, duration), selectNotes(0, toTicks));
-		}
-		
-		// Window is within range.
-		int fromIdx = -1;
-		int toIdx = -1;
-		int selectionCursorStartTicks = 0;
-		for (int idx=0; idx<notes.length; idx++) {
-			Note note = notes[idx];
-
-			// Determine selection start index
-			if (fromIdx == -1) {
-				if (fromTicks <= selectionCursorStartTicks) {
-					fromIdx = idx; // Mark the first note
-				}
-			}
-
-			// Determine selection end index
-			if (toTicks >= selectionCursorStartTicks) {
-				toIdx = idx; // Extend range to include the current note.
-			}
-			
-			// Advance cursor
-			selectionCursorStartTicks += note.duration;
-			if (selectionCursorStartTicks > toTicks) { // At end of selection range?
-				break;
-			}
-		}
-		if (fromIdx==-1 || toIdx==-1) return new Note[]{}; // Empty selection.
-		return Arrays.copyOfRange(notes, fromIdx, toIdx + 1);
+	public int getLength() {
+		return notes.length;
+	}
+	
+	public Note getNote(int idx) {
+		return notes[idx];
+	}
+	
+	public Note[] getNotes() {
+		return notes;
 	}
 	
 	@Override
   public int getDuration() {
 	  return duration;
+  }
+
+	@Override
+  public Iterator<Note> iterator() {
+	  return new PhraseIterator(this);
   }
 
 	@Override

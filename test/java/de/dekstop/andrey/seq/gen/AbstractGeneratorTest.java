@@ -63,14 +63,42 @@ public class AbstractGeneratorTest {
 				new Note[] {}, 
 				gen1.getNotes(offset + 99));
 		
-		// Consecutive notes
+		// Single consecutive notes
 		assertArrayEquals(title, 
 				Arrays.copyOfRange(ascendingSequence, 1, 2), 
 				gen1.getNotes(offset + 120));
+
+		// Multiple consecutive notes
 		assertArrayEquals(title, 
 				Arrays.copyOfRange(ascendingSequence, 2, 4), 
 				gen1.getNotes(offset + 320));
+	
+		// Gap 
   }
+	
+//// select first note
+//assertEquals("phrase note sequence", 1, phrase.selectNotes(0, 1)[0].getPitch());
+//assertEquals("phrase note sequence", 1, phrase.selectNotes(0, 99)[0].getPitch());
+//assertEquals("phrase note sequence", 1, phrase.selectNotes(0, 100)[0].getPitch());
+//
+//// select second note
+//assertEquals("phrase note sequence", 2, phrase.selectNotes(99, 101)[0].getPitch());
+//assertEquals("phrase note sequence", 2, phrase.selectNotes(100, 100)[0].getPitch());
+//assertEquals("phrase note sequence", 2, phrase.selectNotes(100, 200)[0].getPitch());
+//
+//// select note 2 and 3
+//Note[] note23 = Arrays.copyOfRange(ascendingSequence, 1, 3);
+//assertArrayEquals("phrase note sequence", note23, phrase.selectNotes(99, 200));
+//assertArrayEquals("phrase note sequence", note23, phrase.selectNotes(100, 210));
+//assertArrayEquals("phrase note sequence", note23, phrase.selectNotes(100, 299));
+//
+//// select gap between notes
+//assertEquals("phrase note sequence", 0, phrase.selectNotes(1, 2).length);
+//assertEquals("phrase note sequence", 0, phrase.selectNotes(1, 99).length);
+//assertEquals("phrase note sequence", 0, phrase.selectNotes(101, 199).length);
+//
+//// select gap after phrase
+//assertEquals("phrase note sequence", 0, phrase.selectNotes(401, 500).length);
 
 	@Test
 	public void testGetNotesEmptyRange() {
