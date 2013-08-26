@@ -41,9 +41,10 @@ public class Voice {
     this.channel = channel;
     this.generator = generator;
   }
-  long last = 0;
+
   public void play(long nowInTicks) {
-    // Note off
+
+  	// Note off
   	if (curNoteEndInTicks!=-1 && curNoteEndInTicks<=nowInTicks) {
   		stop();
   		clearCurNote();
@@ -57,9 +58,6 @@ public class Voice {
     if (note.getPitch() > 0) {
       midiBus.sendNoteOn(channel, note.getPitch(), note.getVelocity());
       System.out.println("Note on: " + note.getPitch() + " at velocity " + note.getVelocity());
-      long t = System.currentTimeMillis();
-//      System.out.println((t - last) + " " + nowInTicks);
-      last = t;
     }
 
     curNote = note;
