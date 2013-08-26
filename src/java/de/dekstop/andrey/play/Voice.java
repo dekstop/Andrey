@@ -46,8 +46,7 @@ public class Voice {
 
   	// Note off
   	if (curNoteEndInTicks!=-1 && curNoteEndInTicks<=nowInTicks) {
-  		stop();
-  		clearCurNote();
+  		stopCurrentNote();
   	}
 
     // Note on
@@ -64,19 +63,16 @@ public class Voice {
   	curNoteEndInTicks = nowInTicks + note.getDuration();
   }
 
-  public void stop() {
-    if (curNote!=null && curNote.getPitch() != 0) {
-      midiBus.sendNoteOff(channel, curNote.getPitch(), curNote.getVelocity());
-    }
-  }
-
   public void reset() {
-  	clearCurNote();
+  	stopCurrentNote();
     generator.reset();
   }
 
-	void clearCurNote() {
-	  curNote = null;
-  	curNoteEndInTicks = -1;
+  public void stopCurrentNote() {
+    if (curNote!=null && curNote.getPitch() != 0) {
+      midiBus.sendNoteOff(channel, curNote.getPitch(), curNote.getVelocity());
+  	  curNote = null;
+    	curNoteEndInTicks = -1;
+    }
   }
 }
