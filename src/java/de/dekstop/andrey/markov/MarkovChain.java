@@ -24,8 +24,7 @@ import de.dekstop.andrey.util.Rng;
  * First-order Markov Chain.
  */
 public class MarkovChain<T> {
-
-//  T[] trainingData;
+	
   Map<T, Map<T, Float>> chain = new HashMap<T, Map<T,Float>>();
 
   /**
