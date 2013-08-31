@@ -35,6 +35,7 @@ import de.dekstop.andrey.play.Voice;
 import de.dekstop.andrey.seq.Note;
 import de.dekstop.andrey.seq.Pause;
 import de.dekstop.andrey.seq.Phrase;
+import de.dekstop.andrey.seq.gen.NoteLoopGenerator;
 import de.dekstop.andrey.seq.gen.PhraseLoopGenerator;
 import de.dekstop.andrey.seq.gen.MCNoteGenerator;
 import de.dekstop.andrey.seq.gen.MCPhraseGenerator;
@@ -64,7 +65,7 @@ public class Andrey extends PApplet {
   // = State =
   // =========
   
-  float bpm = 120;
+  float bpm = 80;
   float secondsPerBeat = 60f / bpm;
   float ticksPerSecond = TICKS_PER_BEAT / secondsPerBeat;
 
@@ -88,6 +89,9 @@ public class Andrey extends PApplet {
 //    midiBus = new MidiBus(this, -1, "TAL-U-No-62-AU");
 //    midiBus = new MidiBus(this, "LPD8", "Java Sound Synthesizer");
 //    midiBus = new MidiBus(this, -1, "Java Sound Synthesizer");
+
+//  	midiBus.sendControllerChange(1, CTRL_PAN, 20); // Panning: mid left
+//  	midiBus.sendControllerChange(2, CTRL_PAN, 100); // Panning: mid right
     
     loadSong();
     
@@ -104,21 +108,63 @@ public class Andrey extends PApplet {
 	public boolean stopped = false;
 
   void loadSong() {
-  	Note[] sequence = new Note[]{
-    		new Note(45, 100, TICKS_PER_BEAT / 2),
-//    		new Pause(        TICKS_PER_BEAT / 4),
+  	Note[] noteSequence = new Note[]{
+    		new Note(45 + 12, 100, TICKS_PER_BEAT / 2),
     		new Pause(        TICKS_PER_BEAT / 4),
-    		new Note(47,  70, TICKS_PER_BEAT / 4),
+    		new Note(47 + 12,  70, TICKS_PER_BEAT / 4),
     		new Pause(        TICKS_PER_BEAT / 4),
-    		new Note(48,  70, TICKS_PER_BEAT / 4),
+    		new Note(48 + 12,  70, TICKS_PER_BEAT / 4),
     		new Pause(        TICKS_PER_BEAT / 4),
-    		new Note(50,  70, TICKS_PER_BEAT / 4),
+    		new Note(50 + 12,  70, TICKS_PER_BEAT / 4),
     		new Pause(        TICKS_PER_BEAT / 4),
-//    		new Pause(        TICKS_PER_BEAT / 4),
-    		new Note(45 + 24, 40, TICKS_PER_BEAT / 4),
+    		new Note(45 + 24 + 12, 40, TICKS_PER_BEAT / 4),
     };
-//    voices.add(new Voice(midiBus, 1, new MCNoteGenerator(sequence, rng)));
-    voices.add(new Voice(midiBus, 1, new PhraseLoopGenerator(new Phrase[]{new Phrase(sequence)})));
+  	Phrase[] phraseSequence = new Phrase[]{
+  		// bar 1
+  			new Phrase(new Note[]{
+  					new Note(45, 100, TICKS_PER_BEAT / 2),
+  					new Pause(        TICKS_PER_BEAT / 4),
+  			}),
+  			new Phrase(new Note[]{
+  					new Note(48,  70, TICKS_PER_BEAT / 4),
+  					new Pause(        TICKS_PER_BEAT / 4),
+  			}),
+  			new Phrase(new Note[]{
+  					new Note(47,  70, TICKS_PER_BEAT / 4),
+  					new Pause(        TICKS_PER_BEAT / 4),
+  			}),
+  			new Phrase(new Note[]{
+  					new Note(50,  70, TICKS_PER_BEAT / 4),
+  					new Pause(        TICKS_PER_BEAT / 4),
+  			}),
+  			new Phrase(new Note[]{
+  					new Note(45 + 0, 40, TICKS_PER_BEAT / 4),
+  			}),
+  		// bar 2
+  			new Phrase(new Note[]{
+  					new Note(45, 100, TICKS_PER_BEAT / 2),
+  					new Pause(        TICKS_PER_BEAT / 4),
+  			}),
+  			new Phrase(new Note[]{
+  					new Note(47,  70, TICKS_PER_BEAT / 4),
+  					new Pause(        TICKS_PER_BEAT / 4),
+  			}),
+  			new Phrase(new Note[]{
+  					new Note(48,  70, TICKS_PER_BEAT / 4),
+  					new Pause(        TICKS_PER_BEAT / 4),
+  			}),
+  			new Phrase(new Note[]{
+  					new Note(50,  70, TICKS_PER_BEAT / 4),
+  					new Pause(        TICKS_PER_BEAT / 4),
+  			}),
+  			new Phrase(new Note[]{
+  					new Note(45 + 36, 40, TICKS_PER_BEAT / 4),
+  			}),
+    };
+  	voices.add(new Voice(midiBus, 1, new NoteLoopGenerator(noteSequence)));
+//    voices.add(new Voice(midiBus, 1, new MCNoteGenerator(noteSequence, rng)));
+//    voices.add(new Voice(midiBus, 1, new PhraseLoopGenerator(new Phrase[]{new Phrase(noteSequence)})));
+  	voices.add(new Voice(midiBus, 2, new MCPhraseGenerator(phraseSequence, rng)));
 
 //  	Phrase phrase1 = new Phrase(new Note[]{
 //    		new Note(45, 100, TICKS_PER_BEAT / 4),
@@ -181,6 +227,12 @@ public class Andrey extends PApplet {
   	
   }
   
+  public void stop() {
+  	for (Voice voice : voices) {
+    	voice.stopCurrentNote();
+    }
+  }
+  
 	// =============
   // = Callbacks =
   // =============
@@ -188,7 +240,7 @@ public class Andrey extends PApplet {
   public void keyPressed() {
     if (key == ESC) {
       for (Voice voice : voices) {
-        voice.stop();
+        voice.stopCurrentNote();
       }
       midiBus.stop();
       exit();
