@@ -93,7 +93,8 @@ public class Andrey extends PApplet {
 //  	midiBus.sendControllerChange(1, CTRL_PAN, 20); // Panning: mid left
 //  	midiBus.sendControllerChange(2, CTRL_PAN, 100); // Panning: mid right
     
-    loadSong();
+//    loadInstrument01();
+    loadInstrument02();
     
     // Start playback thread
     playbackThread = new PlaybackThread(ticksPerSecond, voices);
@@ -107,7 +108,7 @@ public class Andrey extends PApplet {
 
 	public boolean stopped = false;
 
-  void loadSong() {
+	void loadInstrument01() {
   	Note[] noteSequence = new Note[]{
     		new Note(45 + 12, 100, TICKS_PER_BEAT / 2),
     		new Pause(        TICKS_PER_BEAT / 4),
@@ -165,7 +166,27 @@ public class Andrey extends PApplet {
 //    voices.add(new Voice(midiBus, 1, new MCNoteGenerator(noteSequence, rng)));
 //    voices.add(new Voice(midiBus, 1, new PhraseLoopGenerator(new Phrase[]{new Phrase(noteSequence)})));
   	voices.add(new Voice(midiBus, 2, new MCPhraseGenerator(phraseSequence, rng)));
+	}
+	
+	void loadInstrument02() {
+		Note kick_2 = new Note(45, 100, TICKS_PER_BEAT / 2);
+		Note kick_4 = new Note(45, 90, TICKS_PER_BEAT / 4);
+		Note kick_8 = new Note(45, 80, TICKS_PER_BEAT / 8);
+		Note pause_2 = new Pause(TICKS_PER_BEAT / 2);
+		Note pause_4 = new Pause(TICKS_PER_BEAT / 4);
+		Note pause_8 = new Pause(TICKS_PER_BEAT / 8);
 
+		Note[] sequence = new Note[]{
+				kick_2, kick_2, pause_4, kick_4, kick_2, 
+				kick_2, kick_8, pause_8, kick_8, kick_8, pause_4, kick_4, kick_8, kick_8, pause_4, 
+		};
+
+//  	voices.add(new Voice(midiBus, 1, new NoteLoopGenerator(sequence)));
+  voices.add(new Voice(midiBus, 1, new MCNoteGenerator(sequence, rng)));
+//  	voices.add(new Voice(midiBus, 1, new MCPhraseGenerator(phraseSequence, rng)));
+	}
+	
+  void loadSongOld() {
 //  	Phrase phrase1 = new Phrase(new Note[]{
 //    		new Note(45, 100, TICKS_PER_BEAT / 4),
 //    		new Pause(        TICKS_PER_BEAT / 4),
